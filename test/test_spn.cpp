@@ -40,8 +40,10 @@ int main()
 
     uint16_t plainText = 0b0010011010110111;
     uint32_t key = 0b00111010100101001101011000111111;
+    uint64_t key64 = 0x123456789ABCDEF0;
     auto cipher = encryptSPN(plainText, key);
     assert(decryptSPN(cipher, key) == plainText);
+    assert(decryptSPN(encryptSPN(plainText, key64), key64) == plainText);
 
     return 0;
 }

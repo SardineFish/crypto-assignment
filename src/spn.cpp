@@ -24,6 +24,22 @@ uint16_t encryptSPN(uint16_t plainText, uint32_t key)
     //printf("Y =%016lld\n", stob(cipher));
     return cipher;
 }
+uint16_t encryptSPN(uint16_t plainText, uint64_t key)
+{
+    uint16_t cipher = plainText;
+    for (int i = 0; i < 12; i++)
+    {
+        uint16_t subKey = (key >> (i << 2)) & 0xFFFF;
+        cipher = subKey ^ cipher;
+        cipher = substitute(cipher);
+        if (i < 11)
+            cipher = permutate(cipher);
+    }
+    uint16_t finalKey = (key >> 48) & 0xFFFF;
+    cipher = cipher ^ finalKey;
+    //printf("Y =%016lld\n", stob(cipher));
+    return cipher;
+}
 
 uint16_t decryptSPN(uint16_t cipher, uint32_t key)
 {
@@ -34,6 +50,23 @@ uint16_t decryptSPN(uint16_t cipher, uint32_t key)
     for (int i = 0; i < 4; i++)
     {
         uint16_t subKey = (key >> ((3 - i) << 2)) & 0xFFFF;
+        if (i > 0)
+            plain = reversePermutate(plain);
+        plain = reverseSubstitute(plain);
+        plain = plain ^ subKey;
+    }
+    return plain;
+}
+
+uint16_t decryptSPN(uint16_t cipher, uint64_t key)
+{
+    uint16_t plain = cipher;
+    uint16_t firstKey = (key >> 48) & 0xFFFF;
+    plain = plain ^ firstKey;
+
+    for (int i = 0; i < 12; i++)
+    {
+        uint16_t subKey = (key >> ((11 - i) << 2)) & 0xFFFF;
         if (i > 0)
             plain = reversePermutate(plain);
         plain = reverseSubstitute(plain);
