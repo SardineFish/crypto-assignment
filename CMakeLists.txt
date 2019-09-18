@@ -14,8 +14,11 @@ file(GLOB SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
+include_directories("${PROJECT_SOURCE_DIR}/include")
+
 add_compile_options(-std=c++11)
 add_compile_options(-g)
 add_compile_options(-pthread)
 
 add_executable(crypto_test src/main.cpp)
+add_executable(spn_test test/test_spn.cpp src/spn.cpp)
