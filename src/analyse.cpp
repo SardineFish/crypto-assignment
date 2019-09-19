@@ -79,7 +79,7 @@ tuple<uint16_t, double> findLinearApproximation(uint16_t entry)
                 roundOut |= set_box(boxOut, i);
             }
         }
-        roundOut = permutate(roundOut);
+        roundOut = fastPermutate(roundOut);
         roundIn = roundOut;
     }
     bias *= pow(2, biasCount - 1);
@@ -109,7 +109,7 @@ void calculateBias(int* count, int enumTimes, uint16_t inMask, uint16_t outMask,
     }
 }
 
-uint16_t extractSubKey(function<tuple<uint16_t, uint16_t>()> plaintextGenerator)
+uint16_t linearSubkeyAnalyse(function<tuple<uint16_t, uint16_t>()> plaintextGenerator)
 {
     const uint16_t entry = 0b0000000011001100;
     const auto [roundOut, expectBias] = findLinearApproximation(entry);
@@ -184,7 +184,6 @@ uint16_t extractSubKey(function<tuple<uint16_t, uint16_t>()> plaintextGenerator)
             resultKeyID = i;
         }
     }
-    printf("%016lld\n", stob(resultKeyID << 4));
     return resultKeyID << 4;
     uint16_t resultKey = 0;
     for (int j = 0; j < boxesCount; j++)
@@ -194,15 +193,9 @@ uint16_t extractSubKey(function<tuple<uint16_t, uint16_t>()> plaintextGenerator)
     return resultKey;
 }
 
-struct PlainCipherPair
+uint32_t extractKey(subkeyAnalyser analyser, function<tuple<uint16_t, uint16_t>()> plaintextGenerator)
 {
-    uint16_t plaintext;
-    uint16_t cipher;
-};
-
-uint32_t extractKey(function<tuple<uint16_t, uint16_t>()> plaintextGenerator)
-{
-    uint32_t keyHigh = extractSubKey(plaintextGenerator) << 16;
+    uint32_t keyHigh = analyser(plaintextGenerator) << 16;
 
     vector<PlainCipherPair> pairs;
     for (int i = 0; i < 3;i++)

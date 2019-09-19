@@ -18,6 +18,7 @@ uint16_t decryptSPN(uint16_t cipher, uint64_t key);
 uint16_t substitute(uint16_t in);
 uint8_t substituteBox(uint8_t in);
 #define fastSubstituteBox(IN) SubstituteMap[IN]
+#define fastSBox fastSubstituteBox
 #define fastSubstitute(IN)\
     (set_box(SubstituteMap[get_box(IN, 0)], 0)\
    | set_box(SubstituteMap[get_box(IN, 1)], 1)\

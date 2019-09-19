@@ -22,5 +22,5 @@ add_compile_options(-pthread)
 
 add_executable(crypto_test src/main.cpp)
 add_executable(spn_test test/test_spn.cpp src/spn.cpp)
-add_executable(analyse_test test/test_analyse.cpp src/spn.cpp src/analyse.cpp)
+add_executable(analyse_test test/test_analyse.cpp src/spn.cpp src/analyse.cpp src/differential_cryptanalysis.cpp)
 target_link_libraries(analyse_test pthread)
