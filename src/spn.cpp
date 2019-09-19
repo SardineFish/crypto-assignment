@@ -51,7 +51,7 @@ uint16_t decryptSPN(uint16_t cipher, uint32_t key)
     {
         uint16_t subKey = (key >> ((3 - i) << 2)) & 0xFFFF;
         if (i > 0)
-            plain = reversePermutate(plain);
+            plain = fastReversePermutate(plain);
         plain = reverseSubstitute(plain);
         plain = plain ^ subKey;
     }
@@ -88,6 +88,12 @@ uint16_t substitute(uint16_t in)
     return out;
 }
 
+uint8_t substituteBox(uint8_t in)
+{
+    const uint8_t map[] = {0xe, 0x4, 0xd, 0x1, 0x2, 0xf, 0xb, 0x8, 0x3, 0xa, 0x6, 0xc, 0x5, 0x9, 0x0, 0x7};
+    return map[in];
+}
+
 uint16_t reverseSubstitute(uint16_t in)
 {
     const uint8_t map[] = {0xe, 0x3, 0x4, 0x8, 0x1, 0xc, 0xa, 0xf, 0x7, 0xd, 0x9, 0x6, 0xb, 0x2, 0x0, 0x5};
@@ -122,6 +128,7 @@ uint16_t reversePermutate(uint16_t in)
     }
     return out;
 }
+
 
 uint16_t btol(uint16_t in)
 {
