@@ -7,7 +7,7 @@
 #include <functional>
 #include <cmath>
 #include <stdio.h>
-#include <sys/random.h>
+#include <linux/random.h>
 #include <memory.h>
 #include <thread>
 
