@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/rsa_test",
+            "program": "${workspaceFolder}/bin/pgp_test",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
