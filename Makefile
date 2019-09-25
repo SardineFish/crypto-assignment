@@ -29,3 +29,6 @@ all:
 proto:
 	cd ./src/proto && \
 	protoc --cpp_out=../lib code-audit.proto
+
+cert:
+	openssl ecparam -name prime256v1 -noout -genkey -conv_form uncompressed -outform DER -out ecc_key.der

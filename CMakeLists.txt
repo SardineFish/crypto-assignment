@@ -19,7 +19,7 @@ file(GLOB SOURCES
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
-add_compile_options(-std=c++17)
+add_compile_options(-std=c++2a)
 add_compile_options(-g)
 add_compile_options(-pthread)
 
@@ -27,7 +27,7 @@ add_executable(crypto_test src/main.cpp)
 add_executable(spn_test test/test_spn.cpp src/spn.cpp)
 add_executable(analyse_test test/test_analyse.cpp src/spn.cpp src/analyse.cpp src/differential_cryptanalysis.cpp)
 add_executable(rsa_test src/rsa.cpp src/math_utils test/test_rsa.cpp)
-add_executable(pgp_test src/pgp.cpp test/test_pgp.cpp)
+add_executable(pgp_test src/pgp.cpp src/ecc.cpp test/test_pgp.cpp)
 target_link_libraries(analyse_test pthread)
 target_link_libraries(rsa_test gmp)
 target_link_libraries(rsa_test gmpxx)
