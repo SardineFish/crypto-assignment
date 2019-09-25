@@ -8,8 +8,10 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/pgp_test",
-            "args": [],
+            "program": "${workspaceFolder}/bin/rainbow_test",
+            "args": [
+                "rainbow_table.txt"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

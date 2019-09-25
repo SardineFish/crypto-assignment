@@ -4,9 +4,7 @@
 #include <linux/random.h>
 #include <stdint.h>
 #include <string>
-#include <sys/syscall.h>
-#include <unistd.h>
-#define getrandom(buf, len, flag) syscall(SYS_getrandom, buf, len, flag);
+#include "utils.h"
 
 using namespace std;
 
