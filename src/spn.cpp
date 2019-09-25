@@ -1,6 +1,7 @@
 #include "spn.h"
 #include "math.h"
 #include "stdio.h"
+#include <zlib.h>
 
 using namespace std;
 
@@ -143,4 +144,52 @@ uint64_t stob(uint16_t x)
         bits += ((x >> i) & 1) * pow(10, i);
     }
     return bits;
+}
+
+bool encrypt_spn_cbc(const uint8_t* plaintext, size_t len, const uint8_t* key, size_t keylen, uint16_t iv, uint8_t* cipher, size_t* cipherLen)
+{
+    uint32_t key32 = crc32(0, key, keylen);
+
+    uint16_t lb = iv;
+
+    *cipherLen = 0;
+    for (int i = 0; i < len; i += 2)
+    {
+        uint16_t block = 0;
+        if (i + 1 == len)
+            block = cipher[i] | 0xFF00;
+        else
+            block = *(uint16_t*)(void*)(plaintext + i);
+        block = block ^ lb;
+        block = encryptSPN(block, key32);
+        lb = block;
+        *(uint16_t*)(void*)(cipher + i) = block;
+        *cipherLen += 2;
+    }
+    return true;
+}
+
+bool decrypt_spn_cbc(const uint8_t* cipher, size_t len, const uint8_t* key, size_t keylen, uint16_t iv, uint8_t* plaintext, size_t* plainLen)
+{
+    uint32_t key32 = crc32(0, key, keylen);
+    uint16_t lb = iv;
+    *plainLen = 0;
+
+    for (int i = 0; i < len; i+=2)
+    {
+        uint16_t block = *(uint16_t*)(void*)(cipher + i);
+        uint16_t plain = decryptSPN(block, key32);
+        plain = plain ^ lb;
+        lb = block;
+        if(i + 2 == len && (plain & 0xFF00) == 0xFF)
+        {
+            plaintext[i] = plain & 0XFF;
+            *plainLen = len - 1;
+            return true;
+        }
+        else
+            *(uint16_t*)(void*)(plaintext + i) = plain;
+    }
+    *plainLen = len;
+    return true;
 }

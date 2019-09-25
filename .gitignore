@@ -33,3 +33,6 @@
 
 bin
 build
+
+cipher.out
+*.test

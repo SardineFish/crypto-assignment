@@ -8,9 +8,10 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/rainbow_test",
+            "program": "${workspaceFolder}/bin/spn_test",
             "args": [
-                "rainbow_table.txt"
+                "rainbow_table.txt",
+                "cipher.out"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -77,3 +77,9 @@ uint16_t btol(uint16_t in);
 uint16_t ltob(uint16_t in);
 
 uint64_t stob(uint16_t x);
+
+bool encrypt_spn_cbc(const uint8_t* plaintext, size_t len, const uint8_t* key, size_t keylen, uint16_t iv,
+                     uint8_t* cipher, size_t* cipherLen);
+
+bool decrypt_spn_cbc(const uint8_t* cipher, size_t len, const uint8_t* key, size_t keylen, uint16_t iv,
+                     uint8_t* plaintext, size_t* plainLen);
