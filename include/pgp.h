@@ -14,9 +14,25 @@ struct PGPMessage
 {
     uint8_t iv[32];
     size_t epublen;
+    
     uint8_t* epubkey;
     size_t msglen;
     uint8_t* msg;
+};
+
+struct PGPPubkey
+{
+    uint8_t* pubkey;
+    size_t publen;
+    int curve;
+};
+
+struct PGPPrvkey
+{
+    EC_KEY* key;
+    int curve;
+    uint8_t* prvkey;
+    size_t prvlen;
 };
 
 bool encryptAES256(const uint8_t* plaintext, size_t plainLen, const uint8_t (&key)[32], const uint8_t (&iv)[32],
