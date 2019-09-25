@@ -25,18 +25,12 @@ int main(int argc, char** argv)
     plaintext = string((char*)anotherBuf);
 
     EC_KEY* ecKey = nullptr;
-    const EC_GROUP* ecGroup = nullptr;
-    uint8_t *pubkey, *prvkey;
-    size_t publen, prvlen;
 
     generateECCKey(&ecKey);
-    ecGroup = EC_KEY_get0_group(ecKey);
-    int curve = EC_GROUP_get_curve_name(ecGroup);
-    ecpub2bin(ecKey, &pubkey, &publen);
-    ecprv2bin(ecKey, &prvkey, &prvlen);
+    auto pubkey = toECCPubkey(ecKey);
+    auto prvkey = toECCPrvkey(ecKey);
 
-    auto msg = encryptECC((const uint8_t*)plaintext.c_str(), plaintext.size() + 1, curve, pubkey, publen);
+    auto msg = encryptPGP(pubkey, (uint8_t*)plaintext.data(), plaintext.size());
 
-    decryptECC(&msg, ecKey, buffer, &length);
-
-    }
+    decryptPGP(msg, prvkey, buffer, &length);
+}

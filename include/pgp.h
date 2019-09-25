@@ -14,7 +14,7 @@ struct PGPMessage
 {
     uint8_t iv[32];
     size_t epublen;
-    
+    uint8_t hash[32];
     uint8_t* epubkey;
     size_t msglen;
     uint8_t* msg;
@@ -43,3 +43,7 @@ bool decryptAES256(const uint8_t* cipher, size_t cipherLen, const uint8_t (&key)
 
 bool sha256(const uint8_t* message, size_t len, uint8_t (&hash)[32]);
 string hex(uint8_t* buffer, size_t len);
+
+PGPMessage encryptPGP(ECCPubkey& pubkey, const uint8_t* buffer, const size_t len);
+
+bool decryptPGP(PGPMessage& msg, ECCPrvkey& prvkey, uint8_t* plaintext, size_t* len);

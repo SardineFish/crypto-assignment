@@ -17,7 +17,7 @@ file(GLOB SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
-include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_SOURCE_DIR}/lib/gzip-hpp/include")
 
 add_compile_options(-std=c++2a)
 add_compile_options(-g)
@@ -31,4 +31,4 @@ add_executable(pgp_test src/pgp.cpp src/ecc.cpp test/test_pgp.cpp)
 target_link_libraries(analyse_test pthread)
 target_link_libraries(rsa_test gmp)
 target_link_libraries(rsa_test gmpxx)
-target_link_libraries(pgp_test ssl crypto)
+target_link_libraries(pgp_test ssl crypto z)

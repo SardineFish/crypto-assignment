@@ -1,6 +1,12 @@
 #include "pgp.h"
 #include <array>
+#include <gzip/compress.hpp>
+#include <gzip/config.hpp>
+#include <gzip/decompress.hpp>
+#include <gzip/utils.hpp>
+#include <gzip/version.hpp>
 #include <iomanip>
+#include <memory.h>
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -22,16 +28,16 @@ void cleanup()
     ERR_free_strings();
 }
 
-    bool encryptAES256(const uint8_t* plaintext, size_t plainLen, const uint8_t(&key)[32], const uint8_t(&iv)[32],
+bool encryptAES256(const uint8_t* plaintext, size_t plainLen, const uint8_t(&key)[32], const uint8_t(&iv)[32],
                        uint8_t* cipher, size_t* cipherLen)
-    {
-        EVP_CIPHER_CTX* ctx;
-        int len;
-        if (!(ctx = EVP_CIPHER_CTX_new()))
-            return false;
+{
+    EVP_CIPHER_CTX* ctx;
+    int len;
+    if (!(ctx = EVP_CIPHER_CTX_new()))
+        return false;
 
-        if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-            return false;
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+        return false;
 
         if (1 != EVP_EncryptUpdate(ctx, cipher, &len, plaintext, plainLen))
             return false;
@@ -98,4 +104,34 @@ string hex(uint8_t* buffer, size_t len)
         oss << (int)buffer[i];
     }
     return oss.str();
+}
+
+PGPMessage encryptPGP(ECCPubkey& pubkey,const uint8_t* buffer,const size_t len)
+{
+    PGPMessage msg;
+    auto ziped = gzip::compress((const char*)buffer, len);
+    sha256((uint8_t*)(ziped.data()), ziped.size(), msg.hash);
+    getrandom(msg.iv, 32, 0);
+    encryptECC((uint8_t*)(ziped.data()), ziped.size(), pubkey, msg);
+    return msg;
+}
+
+bool decryptPGP(PGPMessage& msg, ECCPrvkey& prvkey, uint8_t* plaintext, size_t* len)
+{
+    uint8_t hash[32];
+    uint8_t buffer[8192];
+    size_t bufferLen = sizeof(buffer);
+    decryptECC(&msg, prvkey.key, buffer, &bufferLen);
+    sha256(buffer, bufferLen, hash);
+    
+    if(memcmp(hash, msg.hash, 32) != 0)
+    {
+        return false; // verify failed.
+    }
+
+    auto unziped = gzip::decompress((char*)buffer, bufferLen);
+    mempcpy(plaintext, unziped.data(), unziped.size());
+    *len = unziped.size();
+
+    return true;
 }

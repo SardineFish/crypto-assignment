@@ -142,28 +142,25 @@ bool generateSymkey(const EC_KEY* ecKey, const uint8_t* epubkey, size_t epublen,
     return true;
 }
 
-PGPMessage encryptECC(const uint8_t* msg, size_t msgLen, int curve, const uint8_t* pubkey, const size_t keylen)
+bool encryptECC(const uint8_t* msg, size_t msgLen, ECCPubkey& key, PGPMessage& msgCipher)
 {
     uint8_t skey[32];
-    uint8_t iv[32];
-    uint8_t buffer[8192];
-    size_t bufferLen = sizeof(buffer);
     size_t skeyLen = 0;
     uint8_t* epub = nullptr;
     size_t epubLen = 0;
-    generateSymkey(curve, pubkey, keylen, skey, &epub, &epubLen);
+    uint8_t buffer[8192];
+    size_t bufferLen = sizeof(buffer);
+    generateSymkey(key.curve, key.pubkey, key.publen, skey, &epub, &epubLen);
     cout << "skey " << hex(skey, 32) << endl;
 
-    encryptAES256(msg, msgLen, skey, iv, buffer, &bufferLen);
+    encryptAES256(msg, msgLen, skey, msgCipher.iv, buffer, &bufferLen);
 
-    PGPMessage msgCipher;
-    memcpy(msgCipher.iv, iv, 32);
     msgCipher.epublen = epubLen;
     msgCipher.epubkey = epub;
     msgCipher.msglen = bufferLen;
     msgCipher.msg = (uint8_t*)malloc(sizeof(uint8_t) * bufferLen);
     memcpy(msgCipher.msg, buffer, bufferLen);
-    return msgCipher;
+    return true;
 }
 
 bool decryptECC(const PGPMessage* msg, EC_KEY* eckey, uint8_t* plaintext, size_t* len)
@@ -177,6 +174,8 @@ bool decryptECC(const PGPMessage* msg, EC_KEY* eckey, uint8_t* plaintext, size_t
     cout << "skey " << hex(skey, 32) << endl;
 
     decryptAES256(msg->msg, msg->msglen, skey, msg->iv, buffer, &bufferLen);
+    memcpy(plaintext, buffer, bufferLen);
+    *len = bufferLen;
 
     return true;
 }
@@ -186,4 +185,23 @@ bool generateECCKey(EC_KEY** key)
     *key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
     if(1 != EC_KEY_generate_key(*key))
         return false;
+}
+
+ECCPrvkey toECCPrvkey(EC_KEY* key)
+{
+    ECCPrvkey prvkey;
+    auto ecGroup = EC_KEY_get0_group(key);
+    prvkey.key = key;
+    prvkey.curve = EC_GROUP_get_curve_name(ecGroup);
+    return prvkey;
+}
+
+ECCPubkey toECCPubkey(EC_KEY* eckey)
+{
+    ECCPubkey key;
+    auto ecGroup = EC_KEY_get0_group(eckey);
+    key.curve = EC_GROUP_get_curve_name(ecGroup);
+    ecpub2bin(eckey, &key.pubkey, &key.publen);
+
+    return key;
 }
